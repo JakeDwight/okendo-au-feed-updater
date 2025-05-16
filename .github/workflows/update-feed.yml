@@ -17,7 +17,9 @@ jobs:
 
       - name: Write GCP service account key to file
         run: |
-          echo "${{ secrets.GCP_KEY }}" > gcp-key.json
+          echo "$GCP_KEY" | base64 --decode > gcp-key.json
+        env:
+          GCP_KEY: ${{ secrets.GCP_KEY }}
 
       - name: Upload to Google Cloud Storage
         uses: google-github-actions/upload-cloud-storage@v1
@@ -28,4 +30,3 @@ jobs:
           process_gcloudignore: false
         env:
           GOOGLE_APPLICATION_CREDENTIALS: gcp-key.json
-
