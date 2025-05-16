@@ -14,7 +14,6 @@ jobs:
         run: |
           curl -s https://prod-1-reviews-product-reviews-feed.s3.amazonaws.com/5880440a-4a9e-4974-b370-540ebb2d6273/google-product-reviews-feed.xml -o feed.xml
           sed -i 's/dwights.co.nz/dwights.com.au/g' feed.xml
-          echo "✅ feed.xml created"
 
       - name: Confirm feed.xml exists and show preview
         run: |
@@ -31,18 +30,15 @@ jobs:
         env:
           GCP_KEY: ${{ secrets.GCP_KEY }}
 
+      - name: Authenticate with GCP
+        run: |
+          gcloud auth activate-service-account --key-file=gcp-key.json
+          gcloud config set project dwights-okendo-au-feed
+
       - name: Upload feed.xml to Google Cloud Storage
-        uses: google-github-actions/upload-cloud-storage@v1
-        with:
-          path: ./feed.xml
-          destination: dwightsokendoaufeed/google-product-reviews-au.xml
-          parent: false
-          process_gcloudignore: false
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: gcp-key.json
+        run: |
+          gsutil cp feed.xml gs://dwightsokendoaufeed/google-product-reviews-au.xml
 
       - name: Debug: List files in GCS bucket
         run: |
-          echo "🔍 Listing all files in bucket:"
-          gcloud auth activate-service-account --key-file=gcp-key.json
           gsutil ls gs://dwightsokendoaufeed
