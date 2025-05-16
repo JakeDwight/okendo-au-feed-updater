@@ -2,8 +2,8 @@ name: Update Okendo AU Feed
 
 on:
   schedule:
-    - cron: '0 3 * * *'  # Daily at 3am UTC
-  workflow_dispatch:
+    - cron: '0 3 * * *'  # Runs daily at 3am UTC
+  workflow_dispatch: {}  # Allows manual trigger
 
 jobs:
   update-feed:
@@ -17,10 +17,10 @@ jobs:
 
       - name: Upload to Google Cloud Storage
         uses: google-github-actions/upload-cloud-storage@v1
-     with:
-  path: ./feed.xml
-  destination: dwightsokendoaufeed/google-product-reviews-au.xml
-  parent: false
-
+        with:
+          path: ./feed.xml
+          destination: dwightsokendoaufeed/google-product-reviews-au.xml
+          parent: false
+          process_gcloudignore: false
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_KEY }}
