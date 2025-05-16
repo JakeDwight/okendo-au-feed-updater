@@ -22,7 +22,7 @@ jobs:
             echo "❌ feed.xml not found"
             exit 1
           fi
-          echo "✅ feed.xml found:"
+          echo "✅ feed.xml found. Preview:"
           head -n 5 feed.xml
 
       - name: Write GCP service account key to file
@@ -40,3 +40,9 @@ jobs:
           process_gcloudignore: false
         env:
           GOOGLE_APPLICATION_CREDENTIALS: gcp-key.json
+
+      - name: Debug: List files in GCS bucket
+        run: |
+          echo "🔍 Listing all files in bucket:"
+          gcloud auth activate-service-account --key-file=gcp-key.json
+          gsutil ls gs://dwightsokendoaufeed
