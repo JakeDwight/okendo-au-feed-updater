@@ -17,9 +17,10 @@ jobs:
 
       - name: Upload to Google Cloud Storage
         uses: google-github-actions/upload-cloud-storage@v1
-        with:
-          path: feed.xml
-          destination: dwightsokendoaufeed/google-product-reviews-au.xml
-          parent: false
+     with:
+  path: ./feed.xml
+  destination: dwightsokendoaufeed/google-product-reviews-au.xml
+  parent: false
+
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_KEY }}
