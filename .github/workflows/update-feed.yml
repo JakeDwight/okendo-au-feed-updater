@@ -2,18 +2,19 @@ name: Update Okendo AU Feed
 
 on:
   schedule:
-    - cron: '0 3 * * *'  # Daily at 3am UTC
-  workflow_dispatch: {}
+    - cron: '0 3 * * *'  # Run daily at 3am UTC
+  workflow_dispatch:
 
 jobs:
   update-feed:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download Okendo NZ XML
+      - name: Download and modify Okendo NZ XML
         run: |
           curl -s https://prod-1-reviews-product-reviews-feed.s3.amazonaws.com/5880440a-4a9e-4974-b370-540ebb2d6273/google-product-reviews-feed.xml -o feed.xml
           sed -i 's/dwights.co.nz/dwights.com.au/g' feed.xml
+          echo "✅ feed.xml created and domain swapped"
 
       - name: Confirm feed.xml exists and show preview
         run: |
@@ -21,21 +22,19 @@ jobs:
             echo "❌ feed.xml not found"
             exit 1
           fi
-          echo "✅ feed.xml found. Preview:"
           head -n 5 feed.xml
 
       - name: Write GCP service account key to file
         run: |
-          echo "$GCP_KEY" | base64 --decode > gcp-key.json
-        env:
-          GCP_KEY: ${{ secrets.GCP_KEY }}
+          echo "${{ secrets.GCP_KEY }}" | base64 --decode > gcp-key.json
 
       - name: Authenticate with GCP
         run: |
+          sudo apt-get update && sudo apt-get install -y google-cloud-sdk
           gcloud auth activate-service-account --key-file=gcp-key.json
           gcloud config set project dwights-okendo-au-feed
 
-      - name: Upload feed.xml to Google Cloud Storage
+      - name: Upload feed.xml to GCS
         run: |
           gsutil cp feed.xml gs://dwightsokendoaufeed/google-product-reviews-au.xml
 
