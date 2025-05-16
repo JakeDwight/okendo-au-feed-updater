@@ -2,8 +2,8 @@ name: Update Okendo AU Feed
 
 on:
   schedule:
-    - cron: '0 3 * * *'  # Daily at 3am UTC
-  workflow_dispatch: {}   # Allows manual run
+    - cron: '0 3 * * *'  # Runs daily at 3am UTC
+  workflow_dispatch: {}   # Allows manual trigger
 
 jobs:
   update-feed:
@@ -14,7 +14,7 @@ jobs:
         run: |
           curl -s https://prod-1-reviews-product-reviews-feed.s3.amazonaws.com/5880440a-4a9e-4974-b370-540ebb2d6273/google-product-reviews-feed.xml -o feed.xml
           sed -i 's/dwights.co.nz/dwights.com.au/g' feed.xml
-          echo "✅ File downloaded and converted"
+          echo "✅ feed.xml created"
 
       - name: Confirm feed.xml exists and show preview
         run: |
@@ -31,12 +31,12 @@ jobs:
         env:
           GCP_KEY: ${{ secrets.GCP_KEY }}
 
-      - name: Upload to Google Cloud Storage
+      - name: Upload feed.xml to Google Cloud Storage
         uses: google-github-actions/upload-cloud-storage@v1
         with:
           path: ./feed.xml
-          destination: google-product-reviews-au.xml
-          bucket: dwightsokendoaufeed
+          destination: dwightsokendoaufeed/google-product-reviews-au.xml
           parent: false
+          process_gcloudignore: false
         env:
           GOOGLE_APPLICATION_CREDENTIALS: gcp-key.json
